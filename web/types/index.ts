@@ -3,7 +3,7 @@
 export type ItemStatus = 'todo' | 'in_progress' | 'done' | 'archived'
 export type ItemPriority = 'none' | 'low' | 'medium' | 'high' | 'urgent'
 export type ProjectColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink' | 'gray'
-export type ViewType = 'board' | 'list' | 'calendar' | 'projects' | 'archive' | 'focus'
+export type ViewType = 'board' | 'list' | 'calendar' | 'projects' | 'archive' | 'focus' | 'today'
 
 export interface Item {
   id: string
@@ -259,9 +259,9 @@ export interface LogType {
 export interface LogEntry {
   id: string
   user_id: string
-  session_id: string
+  session_id: string | null
   session_task_id: string | null
-  log_type_id: string
+  log_type_id: string | null
   value_numeric: number | null
   value_text: string | null
   value_choice: string | null
