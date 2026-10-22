@@ -12,7 +12,6 @@ import { buildItemTree, flattenItemTree } from '@/lib/hooks/use-items'
 
 function makeItem(overrides: Partial<Item> & { id: string }): Item {
   return {
-    id: overrides.id,
     user_id: 'user-1',
     parent_id: null,
     project_id: null,
