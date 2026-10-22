@@ -31,7 +31,7 @@ export default function AuthCallbackPage() {
             })
           }
 
-          router.push('/board')
+          router.push('/today')
         } else {
           router.push('/sign-in')
         }

@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!isLoading) {
-      router.push(session ? '/board' : '/sign-in')
+      router.push(session ? '/today' : '/sign-in')
     }
   }, [session, isLoading, router])
 

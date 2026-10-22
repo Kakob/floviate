@@ -1,0 +1,65 @@
+/*
+ * Scene animation vocabulary. Scenes combine these classes with a few CSS variables
+ * set inline (e.g. style={{ '--a': '18deg', '--d': '1s' }}) and an inline transform-origin
+ * in SVG viewBox coordinates. Everything loops; nothing depicts progress.
+ */
+.scene { display: block; width: 100%; height: auto; }
+
+/* Ambient */
+.cloud { animation: drift 18s ease-in-out infinite alternate; }
+.leaves { transform-origin: 796px 316px; animation: sway 7s ease-in-out infinite alternate; }
+.breathe { transform-origin: 500px 280px; animation: breathe 5s ease-in-out infinite; }
+.steam { animation: steam 4s ease-out infinite; }
+.cursor { animation: blink 1.8s steps(1) infinite; }
+
+/* Parametric */
+/* Pendulum motion between -var(--a) and var(--a). Offset a second limb with animation-delay: calc(-1 * var(--d)). */
+.swing { animation: swing var(--d, 1s) ease-in-out infinite alternate; }
+/* Gentle vertical bob by var(--y). */
+.bob { animation: bob var(--d, 1s) ease-in-out infinite; }
+/* Scenery that loops leftwards over one 900-unit tile. */
+.scroll { animation: scroll var(--d, 20s) linear infinite; }
+/* Wheels, clock hands: rotate around their own center. */
+.spin { transform-box: fill-box; transform-origin: center; animation: spin var(--d, 1s) linear infinite; }
+/* Clock hands rotate around a given origin instead. */
+.turn { animation: spin var(--d, 60s) linear infinite; }
+/* Music notes, bubbles, smoke puffs: rise and fade. */
+.rise { animation: rise var(--d, 4s) ease-out infinite; }
+/* Embers, lamps, city windows: opacity between var(--from) and var(--to). The animation overrides an opacity attribute. */
+.glow { animation: glow var(--d, 3s) ease-in-out infinite alternate; }
+/* Faucet drop. */
+.drip { animation: drip var(--d, 3s) ease-in infinite; }
+/* Lift a limb to var(--a) and bring it back: curls, forks, jumping jacks. */
+.lift { animation: lift var(--d, 2s) ease-in-out infinite; }
+/* Like lift, but rests most of the loop: an occasional gesture. */
+.puff { animation: puff var(--d, 9s) ease-in-out infinite; }
+/* Charts and tickers: slide one step left, then repeat. */
+.slide { animation: slide var(--d, 6s) linear infinite; }
+
+.paused * { animation-play-state: paused !important; }
+
+@keyframes drift { to { transform: translateX(17px); } }
+@keyframes sway { to { transform: rotate(2deg); } }
+@keyframes breathe { 50% { transform: translateY(-2px); } }
+@keyframes steam { 0% { opacity: 0; transform: translateY(4px); } 40% { opacity: .7; } 100% { opacity: 0; transform: translateY(-11px); } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes swing { from { transform: rotate(calc(-1 * var(--a, 10deg))); } to { transform: rotate(var(--a, 10deg)); } }
+@keyframes bob { 50% { transform: translateY(var(--y, -3px)); } }
+@keyframes scroll { to { transform: translateX(-900px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: .85; }
+  100% { opacity: 0; transform: translate(var(--x, 8px), var(--y, -60px)); }
+}
+@keyframes glow { from { opacity: var(--from, .45); } to { opacity: var(--to, 1); } }
+@keyframes drip {
+  0%, 55% { opacity: 0; transform: translateY(0); }
+  60% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(var(--y, 40px)); }
+}
+@keyframes lift { 0%, 100% { transform: rotate(0); } 40%, 60% { transform: rotate(var(--a, 30deg)); } }
+@keyframes puff { 0%, 55%, 100% { transform: rotate(0); } 68%, 84% { transform: rotate(var(--a, -70deg)); } }
+@keyframes slide { to { transform: translateX(var(--x, -120px)); } }
+
+@media (prefers-reduced-motion: reduce) { .scene * { animation: none !important; } }

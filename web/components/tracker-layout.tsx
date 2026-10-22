@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { LogOut, LayoutGrid, List, Calendar, Plus, FolderOpen, Keyboard, Archive, Target } from 'lucide-react'
+import { LogOut, LayoutGrid, List, Calendar, Plus, FolderOpen, Keyboard, Archive, Target, Sun } from 'lucide-react'
 import { supabase } from '@/lib/supabase-client'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useCreateItem } from '@/lib/hooks/use-items'
@@ -18,6 +18,7 @@ import { useState, useRef, useEffect } from 'react'
 import type { ViewType } from '@/types'
 
 const VIEW_TABS: { view: ViewType; path: string; label: string; icon: typeof LayoutGrid }[] = [
+  { view: 'today', path: '/today', label: 'Today', icon: Sun },
   { view: 'board', path: '/board', label: 'Board', icon: LayoutGrid },
   { view: 'list', path: '/list', label: 'List', icon: List },
   { view: 'calendar', path: '/calendar', label: 'Calendar', icon: Calendar },
@@ -40,7 +41,9 @@ export function TrackerLayout({ children }: { children: React.ReactNode }) {
   const quickAddRef = useRef<HTMLInputElement>(null)
 
   // Determine current view from pathname
-  const currentView = pathname.includes('/list')
+  const currentView = pathname.includes('/today')
+    ? 'today'
+    : pathname.includes('/list')
     ? 'list'
     : pathname.includes('/calendar')
     ? 'calendar'
@@ -76,7 +79,7 @@ export function TrackerLayout({ children }: { children: React.ReactNode }) {
   // Global keyboard shortcut for quick add
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as Element)?.tagName)
+      const isInput = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes((e.target as Element)?.tagName)
       // Press 'n' to focus quick add (when not in an input)
       if (e.key === 'n' && !isInput) {
         e.preventDefault()
@@ -116,7 +119,7 @@ export function TrackerLayout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between gap-3 py-3 flex-wrap">
             {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
@@ -126,7 +129,7 @@ export function TrackerLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* View Tabs */}
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center gap-1 max-w-full overflow-x-auto">
               {VIEW_TABS.map(({ view, path, label, icon: Icon }) => (
                 <button
                   key={view}
@@ -147,7 +150,7 @@ export function TrackerLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3">
               <FocusSessionIndicator />
               <GlobalTimerIndicator />
-              <form onSubmit={handleQuickAdd} className="relative">
+              {currentView !== 'today' && <form onSubmit={handleQuickAdd} className="relative">
                 <input
                   ref={quickAddRef}
                   type="text"
@@ -163,7 +166,7 @@ export function TrackerLayout({ children }: { children: React.ReactNode }) {
                   }`}
                 />
                 <Plus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              </form>
+              </form>}
 
               <TimeSummaryButton />
 
