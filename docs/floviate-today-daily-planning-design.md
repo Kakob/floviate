@@ -6,6 +6,12 @@
 **Depends on:** Focus Session Engine (built), Daily Rhythm logging (built)
 **Relationship to other docs:** This is the thin daily layer on top of the existing focus engine. The Journal PRD (v8) stays deferred until this loop is dogfooded daily.
 
+> **Update (Sept 24, 2026) — Living Day Scenes.** The first Today slice shipped as *Living Day Scenes* (see `docs/living-day-scenes-log.md`). Two decisions amend this doc:
+> - **Clock times are optional soft anchors.** Order is still primary. A block may carry a planned start/end; while that time covers now, it is the current scene, otherwise the next planned untimed block in order is. There are still no overdue states — a timed block whose time passed is simply no longer current.
+> - **Check-ins live in `log_entries`** (extended with `day_block_id` / `event_kind`), not a new logging system. This does change an existing table: `session_id` and `log_type_id` are now nullable for day check-ins.
+>
+> The `day_blocks` shape differs from §6: no `day_plans` table yet (blocks carry `plan_date`), no `block_type`/durations/timers, and `status` is `planned | skipped | done` with `done` set only by the user.
+
 ---
 
 ## 1. Problem

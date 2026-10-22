@@ -108,9 +108,9 @@ There is at most one row in `time_entries` with `ended_at IS NULL` per user — 
 
 ## 9. App Router layout and routing
 
-**Files:** `web/app/layout.tsx`, `web/app/providers.tsx`, `web/app/(tracker)/layout.tsx`, `web/components/tracker-layout.tsx`, `web/app/(tracker)/{board,list,calendar,projects,archive,focus}/page.tsx`
+**Files:** `web/app/layout.tsx`, `web/app/providers.tsx`, `web/app/(tracker)/layout.tsx`, `web/components/tracker-layout.tsx`, `web/app/(tracker)/{today,board,list,calendar,projects,archive,focus}/page.tsx`
 
-Next.js App Router with a route group `(tracker)` that wraps all authenticated views in a shared shell containing the nav, quick-add input, timer indicator, focus-session indicator, details panel, and the two singleton providers.
+Next.js App Router with a route group `(tracker)` that wraps all authenticated views in a shared shell containing the nav, quick-add input, timer indicator, focus-session indicator, details panel, and the two singleton providers. `/` and the auth callback redirect signed-in users to `/today`.
 
 **Mechanism.** The root `layout.tsx` only mounts `<Providers>` (which composes `AuthProvider` and `QueryClientProvider`). The `(tracker)` route group is purely organizational — it does not appear in URLs — and its `layout.tsx` enforces auth then renders `<TrackerLayout>`. `TrackerLayout` derives the active tab from `usePathname()`, owns the global keyboard shortcut handler, and mounts `<TimerProvider />` and `<FocusSessionProvider />` exactly once so their intervals do not multiply across route changes. The details panel and focus-session setup modal are conditionally rendered here so they overlay any view. Each `page.tsx` is a client component that calls TanStack hooks for its data, the UI store for shared interaction state, and registers its own keyboard shortcuts.
 
@@ -118,7 +118,19 @@ Next.js App Router with a route group `(tracker)` that wraps all authenticated v
 
 ---
 
-## 10. Tech summary
+## 10. Living Day Scenes (Today)
+
+**Files:** `web/app/(tracker)/today/page.tsx`, `web/components/day/*`, `web/lib/day-scenes.ts`, `web/lib/hooks/use-day-scenes.ts`, `web/lib/scene-support.ts`, `supabase/migrations/20260924000000_living_day_scenes.sql`
+
+The Today page shows an animated scene for what the user *planned* to be doing now, and lets them record what is *actually* happening. Planned and observed data never mix: elapsed time never changes a plan's status.
+
+**Mechanism.** `day_blocks` rows are the plan: ordered by `position`, with optional `planned_start`/`planned_end` anchors, a `scene` preset key, and a status of `planned`, `skipped`, or `done` (the last only when the user says so). `currentBlock()` picks a planned timed block covering now (latest start wins on overlap), otherwise the first planned untimed block in order. Check-ins are `log_entries` rows with an `event_kind`; `session_id`/`log_type_id` are nullable for them, and a `log_entries_context` check keeps old session logs intact. A BEFORE INSERT trigger stores the plan as it was (`plan_snapshot`) on each check-in. A SECURITY DEFINER AFTER UPDATE trigger on `day_blocks` writes `plan_changed`/`finished`/`skipped` events with `previous_plan`, so editing a plan never rewrites history. A restrictive insert policy only lets clients write `thought`, `started`, and `changed_activity`. `LivingScene` is a pure SVG/CSS renderer driven by the `SCENE_PRESETS` registry (`components/day/scenes.ts`) and knows nothing about plans, clocks, or check-ins.
+
+**Talks to:** `day_blocks`, `log_entries`; `SceneSupportAdapter` (currently `silentAdapter`) is the single seam for future music/narration, invoked only by explicit user requests, never by logging.
+
+---
+
+## 11. Tech summary
 
 - **Frontend:** Next.js 14 App Router, React 18, TypeScript, Tailwind CSS, Lucide icons.
 - **State:** Zustand for UI and focus-session state; TanStack Query v5 for server state with optimistic mutations.
