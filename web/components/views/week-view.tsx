@@ -6,6 +6,7 @@ import type { Item } from '@/types'
 import { STATUS_CONFIG } from '@/types'
 import { useCreateItem, useUpdateItem } from '@/lib/hooks/use-items'
 import { useUIStore } from '@/lib/stores/ui-store'
+import { layoutLanes } from '@/lib/time-grid'
 
 const HOUR_HEIGHT = 60 // 1px per minute
 const SNAP_MINUTES = 15
@@ -17,11 +18,6 @@ interface ScheduledItem extends Item {
   startMin: number
   endMin: number
   dayIdx: number
-}
-
-interface LaidOutItem extends ScheduledItem {
-  lane: number
-  totalLanes: number
 }
 
 type DragState =
@@ -618,46 +614,4 @@ function formatRange(days: Date[]): string {
     return `${first.toLocaleDateString(undefined, monthFmt)} ${first.getDate()} – ${last.toLocaleDateString(undefined, monthFmt)} ${last.getDate()}, ${last.getFullYear()}`
   }
   return `${first.toLocaleDateString(undefined, monthFmt)} ${first.getDate()}, ${first.getFullYear()} – ${last.toLocaleDateString(undefined, monthFmt)} ${last.getDate()}, ${last.getFullYear()}`
-}
-
-function layoutLanes(events: ScheduledItem[]): LaidOutItem[] {
-  const sorted = [...events].sort(
-    (a, b) => a.startMin - b.startMin || a.endMin - b.endMin
-  )
-  const result: LaidOutItem[] = []
-  let cluster: LaidOutItem[] = []
-  let clusterEnd = -1
-
-  const flush = () => {
-    if (cluster.length === 0) return
-    const lanes: number[] = []
-    for (const ev of cluster) {
-      let laneIdx = lanes.findIndex((endMin) => endMin <= ev.startMin)
-      if (laneIdx === -1) {
-        laneIdx = lanes.length
-        lanes.push(ev.endMin)
-      } else {
-        lanes[laneIdx] = ev.endMin
-      }
-      ev.lane = laneIdx
-    }
-    cluster.forEach((ev) => (ev.totalLanes = lanes.length))
-    result.push(...cluster)
-    cluster = []
-    clusterEnd = -1
-  }
-
-  for (const ev of sorted) {
-    const laneEv: LaidOutItem = { ...ev, lane: 0, totalLanes: 1 }
-    if (cluster.length === 0 || laneEv.startMin < clusterEnd) {
-      cluster.push(laneEv)
-      clusterEnd = Math.max(clusterEnd, laneEv.endMin)
-    } else {
-      flush()
-      cluster.push(laneEv)
-      clusterEnd = laneEv.endMin
-    }
-  }
-  flush()
-  return result
 }
