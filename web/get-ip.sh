@@ -29,7 +29,7 @@ else
     echo "✅ Your local IP address is: $IP"
     echo ""
     echo "📱 To access from your phone:"
-    echo "   http://$IP:3000"
+    echo "   http://$IP:3004"
     echo ""
     echo "Make sure:"
     echo "  1. Your phone is on the same WiFi network"

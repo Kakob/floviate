@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { CheckCircle } from 'lucide-react'
-import { supabase } from '@/lib/supabase-client'
+import Link from 'next/link'
+import { isSupabaseConfigured, supabase } from '@/lib/supabase-client'
 
 export default function SignInPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -75,6 +74,18 @@ export default function SignInPage() {
       })
       setIsLoading(false)
     }
+  }
+
+  if (!isSupabaseConfigured) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-stone-50 p-6">
+        <div className="w-full max-w-md text-center space-y-4">
+          <h1 className="text-3xl font-semibold text-gray-900">No account needed</h1>
+          <p className="text-gray-600">Free guided meditations are ready to explore. Account sign-in isn’t configured on this installation.</p>
+          <Link href="/" className="inline-block rounded-full bg-teal-800 px-6 py-3 text-white">Explore meditations</Link>
+        </div>
+      </main>
+    )
   }
 
   return (

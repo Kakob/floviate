@@ -1,6 +1,8 @@
 # Architecture
 
-Floviate is a Next.js + Supabase task tracker with Kanban, list, monthly calendar, weekly time-blocking, and a structured focus-session mode. This document describes the load-bearing components in roughly the order a reviewer is most likely to ask about them.
+Floviate’s public app is a guided meditation library, composer, and audio player. Its scripts, deterministic composition, local audio, and anonymous routes are documented in [Guided Meditation MVP](guided-meditation-mvp.md). Public pages do not mount account providers or initialize Supabase. The root route is the meditation library.
+
+The original Next.js + Supabase task workspace remains intact under its existing authenticated routes. The sections below describe that preserved workspace, including Kanban, list, monthly calendar, weekly time-blocking, and focus sessions. Its route-group layout now owns the account/query providers previously mounted at the root.
 
 ---
 

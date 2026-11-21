@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase-client'
+import { isSupabaseConfigured, supabase } from '@/lib/supabase-client'
 import type { Session, User } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -21,9 +21,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(false)
+      return
+    }
+
+    let active = true
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!active) return
       setSession(session)
       setIsLoading(false)
+    }).catch(() => {
+      if (active) setIsLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -32,7 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      active = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   return (

@@ -1,6 +1,30 @@
-# Project Tracker
+# Floviate
 
-A fast, minimal-click project/task management app with better UX than Notion's projects and tasks.
+A public guided meditation library, composer, and audio player. Start with **I Got It**, choose three minutes, and experience original narration, cinematic dialogue, visualization, and quiet time. Brown noise and rain are optional and generated locally.
+
+## Run the meditation app
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Open [http://localhost:3004](http://localhost:3004). Free meditations need no account, Supabase configuration, paid API, or audio download. Press Play to enable browser audio. Initial narration uses the device’s text-to-speech voices; keep the page open and the phone awake while listening.
+
+For a phone on the same Wi-Fi, open `http://YOUR_COMPUTER_LAN_IP:3004` in Safari. `npm run dev` binds to all interfaces. On a Mac, `ipconfig getifaddr en0` commonly returns the Wi-Fi address. Allow local network access if the operating system asks.
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+[Guided meditation development notes](docs/guided-meditation-mvp.md) explain script authoring, composition, audio behavior, configuration, and the phone verification checklist. Optional resource destinations and account settings are documented in [web/.env.example](web/.env.example). Missing resource links remain unavailable; no payment or subscription is simulated.
+
+## Preserved task workspace
+
+The original task-management application and database are preserved behind their existing authenticated routes, including `/today`, `/board`, `/list`, and `/calendar`. They are independent of meditation playback and absent from public navigation. Configure Supabase only if you need the account and task features below.
 
 ## Features
 
@@ -17,7 +41,7 @@ A fast, minimal-click project/task management app with better UX than Notion's p
 - **State**: Zustand (UI state) + TanStack Query (server state)
 - **Backend**: Supabase (PostgreSQL + Auth + RLS)
 
-## Quick Start
+## Task workspace setup (optional)
 
 ### 1. Supabase Setup
 
@@ -39,7 +63,7 @@ A fast, minimal-click project/task management app with better UX than Notion's p
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 4. Run the development server: `npm run dev`
-5. Open [http://localhost:3000](http://localhost:3000)
+5. Open [http://localhost:3004/sign-in](http://localhost:3004/sign-in)
 
 ### 3. First Run
 
